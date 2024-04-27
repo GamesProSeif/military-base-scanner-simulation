@@ -1,23 +1,31 @@
 const canvasSize = [1000, 1000];
 
-let car;
-let obstaclePoints = [];
-let grids = [];
+let aiAgent,
+	car,
+	frontSensor,
+	sideSensor,
+	obstaclePoints = [],
+	grids = [];
 
 function setup() {
 	createCanvas(canvasSize[0], canvasSize[1]);
 	car = new Car(0, 0);
+	frontSensor = new UltraSonicSensor(car, 0);
+	sideSensor = new UltraSonicSensor(car, PI / 2);
+	aiAgent = new AiAgent(car, frontSensor, sideSensor);
 }
 
 function draw() {
 	frameRate(60);
 	background(220);
 	translate(width / 2, height / 2);
-	car.update();
 	drawObstacles();
 	drawGrids();
 
+	aiAgent.run();
 	car.show();
+	frontSensor.show();
+	sideSensor.show();
 }
 
 function drawObstacles() {

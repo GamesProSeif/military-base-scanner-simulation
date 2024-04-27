@@ -11,8 +11,8 @@ class Grid {
 	static GRIDS = [];
 
 	static addGrid(x, y) {
-		x = floor(x);
-		y = floor(y);
+		x = round(x);
+		y = round(y);
 		let gridX = x - x % Grid.GRID_SIZE;
 		let gridY = y - y % Grid.GRID_SIZE;
 		// if (gridX)

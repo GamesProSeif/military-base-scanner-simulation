@@ -3,6 +3,7 @@ class UltraSonicSensor {
 		this.car = car;
 		this.angle = angle;
 		this.range = 100;
+		this.detectDistance = 20;
 	}
 
 	show() {
@@ -34,5 +35,9 @@ class UltraSonicSensor {
 		}
 
 		return Math.min(...lengths);
+	}
+
+	get detected() {
+		return this.getDistance() < this.range - this.detectDistance;
 	}
 }
