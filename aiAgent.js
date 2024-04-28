@@ -23,22 +23,7 @@ class AiAgent {
 		switch (this.state) {
 			case 1:
 				if (this.sideSensor.detected) {
-					let sideDistance1 = this.sideSensor.getDistance();
-					await this.car.turn(0.01);
-					let sideDistance2 = this.sideSensor.getDistance();
-					let direction = sideDistance2 < sideDistance1 ? 1 : -1;
-
-					do {
-						sideDistance1 = this.sideSensor.getDistance();
-						await this.car.turn(0.01 * direction);
-						sideDistance2 = this.sideSensor.getDistance();
-						if (
-							direction === 1 && sideDistance1 < sideDistance2
-							|| direction === -1 && sideDistance1 > sideDistance2
-						)
-							break;
-					} while (true);
-
+					await this.sideFaceWall();
 					this.sideScanning = true;
 					this.state = 3;
 				}
@@ -57,7 +42,25 @@ class AiAgent {
 				}
 				break;
 			case 3:
-				await this.car.moveForward();
+				if (this.frontSensor.detected) {
+					await this.car.turn(PI / 2);
+					await this.sideFaceWall(); 
+					this.sideScanning = true;
+					this.state = 3;
+				}
+
+				const sideDistance = this.sideSensor.getDistance();
+				if (sideDistance > this.sideSensor.range - this.sideSensor.detectDistance) {
+					await this.car.turn(-PI / 4);
+				} else if (sideDistance > this.sideSensor.range * 0.7) {
+					await this.car.turn(-0.1);
+				} else if (sideDistance < this.sideSensor.range * 0.2) {
+					await this.car.turn(0.2);
+				} else if (sideDistance < this.sideSensor.range * 0.3) {
+					await this.car.turn(0.1);
+				}
+				await this.car.moveForward(40);
+				console.log(Grid.gridsAddedPerSecond);
 				break;
 			case 4:
 				break;
@@ -91,5 +94,26 @@ class AiAgent {
 			if (distance < sensor.range && i === floor(distance))
 				grid.obstacle = 1;
 		}
+	}
+
+	async sideFaceWall() {
+		let sideDistance1 = this.sideSensor.getDistance();
+		await this.car.turn(0.01);
+		let sideDistance2 = this.sideSensor.getDistance();
+		let direction = sideDistance2 < sideDistance1 ? 1 : -1;
+
+		while (true) {
+			sideDistance1 = this.sideSensor.getDistance();
+			await this.car.turn(0.1 * direction);
+			sideDistance2 = this.sideSensor.getDistance();
+			if (sideDistance1 < sideDistance2)
+				break;
+			// if (
+			// 	direction === 1 && sideDistance1 < sideDistance2
+			// 	|| direction === -1 && sideDistance1 < sideDistance2
+			// )
+			// 	break;
+		}
+
 	}
 }
