@@ -5,7 +5,9 @@ let aiAgent,
 	frontSensor,
 	sideSensor,
 	obstaclePoints = [],
-	grids = [];
+	grids = [],
+	stats,
+	shapeCounter = 0;
 
 function setup() {
 	createCanvas(canvasSize[0], canvasSize[1]);
@@ -13,11 +15,20 @@ function setup() {
 	frontSensor = new UltraSonicSensor(car, 0);
 	sideSensor = new UltraSonicSensor(car, PI / 2);
 	aiAgent = new AiAgent(car, frontSensor, sideSensor);
+	stats =[
+		["mouseX", () => (mouseX - width / 2).toFixed(2)],
+		["mouseY", () => (mouseY - height / 2).toFixed(2)],
+		["Car X,Y", () => `${round(car.x)} ${round(car.y)}`],
+		["Car Angle", () => `${car.angle.toFixed(2)} ${(car.angle * 180 / PI).toFixed(2)}`],
+		["State", () => aiAgent.state],
+	]
 }
 
 function draw() {
 	frameRate(60);
 	background(220);
+	drawCursor();
+	drawStats();
 	translate(width / 2, height / 2);
 	drawObstacles();
 	drawGrids();
@@ -35,11 +46,13 @@ function drawObstacles() {
 		stroke(0);
 		strokeWeight(1);
 		noFill();
-		beginShape();
-		obstaclePoints.forEach(p => {
-			vertex(p.x, p.y);
-		});
-		endShape();
+		for (let i = 0; i < shapeCounter + 1; i++) {
+			beginShape();
+			obstaclePoints.filter(p => p.z === i).forEach(p => {
+				vertex(p.x, p.y);
+			});
+			endShape();
+		}
 		obstaclePoints.forEach(p => {
 			strokeWeight(5);
 			point(p);
@@ -53,5 +66,26 @@ function drawGrids() {
 
 function mouseClicked() {
 	// Grid.addGrid(mouseX - width / 2, mouseY - height / 2);
-	obstaclePoints.push(createVector(mouseX - width / 2, mouseY - height / 2));
+	obstaclePoints.push(createVector(mouseX - width / 2, mouseY - height / 2, shapeCounter));
+}
+
+function keyPressed() {
+	if (key === " ")
+		shapeCounter++;
+}
+
+function drawCursor() {
+	stroke(0);
+	strokeWeight(0.5);
+	line(0, mouseY, width, mouseY);
+	line(mouseX, 0, mouseX, height);
+}
+
+function drawStats() {
+	textSize(15);
+	fill(0)
+	for (let i = 0; i < stats.length; i++) {
+		const stat = stats[i];
+		text(`${stat[0]}:\t${stat[1]()}`, 5, i * 18 + 15);
+	}
 }

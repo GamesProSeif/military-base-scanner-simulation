@@ -4,7 +4,7 @@ class Car {
 		this.y = Math.floor(y);
 		this.angle = PI / 2;
 		this.turnSpeed = 0.01;
-		this.speed = 0.5;
+		this.speed = 1.5;
 		this.delay = 20;
 		this.wid = 20;
 		this.len = 30;
@@ -16,6 +16,8 @@ class Car {
 
 		this.outlineCreated = false;
 		this.followingWall = false;
+
+		this.deltaAngle = 0;
 	}
 
 	get transMatrix() {
@@ -90,6 +92,7 @@ class Car {
 			return;
 		this.turning = true;
 		const targetAngle = this.angle + angle;
+		this.deltaAngle += angle;
 
 		return new Promise(async (res) => {
 			while (true) {
@@ -170,5 +173,9 @@ class Car {
 		strokeWeight(5);
 		point(this.x, this.y);
 
+	}
+
+	startDeltaAngle() {
+		this.deltaAngle = 0;
 	}
 }

@@ -8,6 +8,8 @@ class AiAgent {
 		this.sideScanning = false;
 		this.state = 1;
 		this.idle = true;
+
+		this.tempPos = null;
 	}
 
 	async run() {
@@ -26,6 +28,8 @@ class AiAgent {
 					await this.sideFaceWall();
 					this.sideScanning = true;
 					this.state = 3;
+					this.car.startDeltaAngle();
+					this.tempPos = createVector(this.car.x, this.car.y);
 				}
 				else if (this.frontSensor.detected)
 					this.state = 2;
@@ -40,6 +44,8 @@ class AiAgent {
 					this.sideScanning = true;
 					this.state = 3;
 				}
+				this.car.startDeltaAngle();
+				this.tempPos = createVector(this.car.x, this.car.y);
 				break;
 			case 3:
 				if (this.frontSensor.detected) {
@@ -60,11 +66,22 @@ class AiAgent {
 					await this.car.turn(0.1);
 				}
 				await this.car.moveForward(40);
-				console.log(Grid.gridsAddedPerSecond);
+				const distance = createVector(this.car.x, this.car.y).dist(this.tempPos);
+				if (distance <= 30)
+					this.state = 4;
 				break;
 			case 4:
+				if (this.car.deltaAngle <= -5)
+					this.state = 5;
+				else if (this.car.deltaAngle >= 5) {
+					this.state = 6;
+					Grid.fillGrid();
+				}
 				break;
 			case 5:
+				await this.car.turn(PI / 2);
+				this.sideScanning = false;
+				this.state = 1;
 				break;
 			case 6:
 				break;

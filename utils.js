@@ -159,3 +159,18 @@ function cartesianToPolar(x1, y1, x2, y2) {
 function sleep(ms) {
 	return new Promise((res) => { setTimeout(res, ms) });
 }
+
+function floodFill(x, y, oldColor, newColor) {
+
+	const grid = Grid.get(x, y);
+	if (grid && grid.obstacle === oldColor) {
+		grid.obstacle = newColor;
+		grid.discovered = true;
+
+		const size = Grid.GRID_SIZE;
+		floodFill(grid.x - size, grid.y, oldColor, newColor);
+		floodFill(grid.x + size, grid.y, oldColor, newColor);
+		floodFill(grid.x, grid.y - size, oldColor, newColor);
+		floodFill(grid.x, grid.y + size, oldColor, newColor);
+	}
+}
