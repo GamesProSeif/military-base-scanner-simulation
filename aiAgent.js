@@ -74,8 +74,18 @@ class AiAgent {
 				if (this.car.deltaAngle <= -5)
 					this.state = 5;
 				else if (this.car.deltaAngle >= 5) {
-					this.state = 6;
 					Grid.fillGrid();
+					const contour = Grid.findInnerPath();
+					let closestPixel = contour[0];
+					let closestDistance = Infinity;
+					for (const c of contour) {
+						const distance = dist(this.car.x, this.car.y, c.x, c.y);
+						if (distance < closestDistance)
+							closestPixel = c;
+					}
+					this.sideScanning = false;
+					await this.car.goTo(closestPixel.x, closestPixel.y);
+					this.state = 6;
 				}
 				break;
 			case 5:
@@ -108,8 +118,13 @@ class AiAgent {
 			let y = this.car.y + i * sin(sensor.angle - this.car.angle);
 			let grid = Grid.addGrid(x, y);
 			grid.discovered = true;
-			if (distance < sensor.range && i === floor(distance))
+			if (distance < sensor.range && i === floor(distance)) {
 				grid.obstacle = 1;
+				grid.getNeighbors(true).forEach(g => {
+					g.obstacle = 1
+					g.discovered = true;
+				});
+			}
 		}
 	}
 

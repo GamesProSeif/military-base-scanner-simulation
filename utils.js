@@ -161,7 +161,6 @@ function sleep(ms) {
 }
 
 function floodFill(x, y, oldColor, newColor) {
-
 	const grid = Grid.get(x, y);
 	if (grid && grid.obstacle === oldColor) {
 		grid.obstacle = newColor;
@@ -172,5 +171,23 @@ function floodFill(x, y, oldColor, newColor) {
 		floodFill(grid.x + size, grid.y, oldColor, newColor);
 		floodFill(grid.x, grid.y - size, oldColor, newColor);
 		floodFill(grid.x, grid.y + size, oldColor, newColor);
+	}
+}
+
+async function findContour(x, y, color, contour, visited) {
+	if (!visited)
+		visited = [];
+	if (visited.some(g => g[0] === x && g[1] === y))
+		return;
+	visited.push([x, y]);
+	const grid = Grid.get(x, y);
+	if (grid && grid.discovered && grid.obstacle === color) {
+		const size = Grid.GRID_SIZE;
+		findContour(grid.x - size, grid.y, color, contour, visited);
+		findContour(grid.x + size, grid.y, color, contour, visited);
+		findContour(grid.x, grid.y - size, color, contour, visited);
+		findContour(grid.x, grid.y + size, color, contour, visited);
+	} else {
+		return contour.push(grid);
 	}
 }

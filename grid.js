@@ -66,6 +66,30 @@ class Grid {
 			}
 
 		floodFill(minMax[0] - size, minMax[1] - size, 0, 1);
+
+		Grid.GRIDS.sort((a, b) => {
+			// console.log(a.x + a.y * (minMax[2] - minMax[0]), b.x + b.y * (minMax[2] - minMax[0]));
+			return a.x + a.y * (minMax[2] - minMax[0])
+			- (b.x + b.y * (minMax[2] - minMax[0]))
+		});
+	}
+
+	static findInnerPath() {
+		let grid;
+		for (const g of Grid.GRIDS) {
+			if (g.obstacle === 0 && g.discovered) {
+				grid = g;
+				break;
+			}
+		}
+
+		let contour = [];
+
+		findContour(grid.x, grid.y, 0, contour);
+
+		contour = contour.filter(grid => grid.obstacle !== 1);
+
+		return contour;
 	}
 
 	static get(x, y) {
@@ -83,6 +107,35 @@ class Grid {
 		return foundGrid;
 	}
 
+	getNeighbors(addIfNotFound = false) {
+		const size = Grid.GRID_SIZE;
+		let neighbors;
+		if (addIfNotFound)
+			neighbors = [
+				Grid.addGrid(this.x - size, this.y),
+				Grid.addGrid(this.x + size, this.y),
+				Grid.addGrid(this.x, this.y - size),
+				Grid.addGrid(this.x, this.y + size),
+				// Grid.addGrid(grid.x - size, grid.y),
+				// Grid.addGrid(grid.x + size, grid.y),
+				// Grid.addGrid(grid.x, grid.y - size),
+				// Grid.addGrid(grid.x, grid.y + size),
+			]
+		else
+			neighbors = [
+				Grid.get(this.x - size, this.y),
+				Grid.get(this.x + size, this.y),
+				Grid.get(this.x, this.y - size),
+				Grid.get(this.x, this.y + size),
+				// Grid.get(grid.x - size, grid.y),
+				// Grid.get(grid.x + size, grid.y),
+				// Grid.get(grid.x, grid.y - size),
+				// Grid.get(grid.x, grid.y + size),
+			].filter(n => n);
+
+		return neighbors;
+	}
+
 	show() {
 		noStroke();
 		if (!this.discovered)
@@ -94,6 +147,9 @@ class Grid {
 					break;
 				case 1:
 					fill("rgba(0,0,0,0.7)")
+					break;
+				case 2:
+					fill("rgba(255,0,0,0.7)")
 					break;
 				default:
 					fill("rgba(0,0,0,0.1)");

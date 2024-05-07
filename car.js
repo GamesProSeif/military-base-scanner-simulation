@@ -111,54 +111,20 @@ class Car {
 		});
 	}
 
-	// scan(sensor, distance) {
-	// 	for (let i = 0; i <= distance; i++) {
-	// 		let x = this.x + i * cos(sensor.angle - this.angle);
-	// 		let y = this.y + i * sin(sensor.angle - this.angle);
-	// 		let grid = Grid.addGrid(x, y);
-	// 		grid.discovered = true;
-	// 		if (distance < sensor.range && i === floor(distance))
-	// 			grid.obstacle = 1;
-	// 	}
-	// }
+	async goTo(x, y) {
+		// implement A* algorithm
+		const destination = createVector(x, y);
+		const position = createVector(this.x, this.y);
+		const distance = position.dist(destination);
+		const carAngle = p5.Vector.fromAngle(this.angle);
 
-	// async update() {
-	// 	const frontDistance = this.frontSensor.getDistance();
-	// 	const sideDistance = this.sideSensor.getDistance();
-	// 	this.scan(this.frontSensor, frontDistance);
-	// 	this.scan(this.sideSensor, sideDistance);
+		const direction = p5.Vector.sub(destination, position);
 
-	// 	if (this.moving || this.turning)
-	// 		return;
+		const deltaAngle = direction.angleBetween(carAngle);
 
-	// 	if (this.followingWall) {
-	// 		await this.moveForward();
-	// 		await this.moveForward();
-	// 		let newSideDistance = this.sideSensor.getDistance();
-	// 		if (newSideDistance === this.sideSensor.range)
-	// 		// continue from here, when side wall ends
-	// 			await this.turn(-PI / 2);
-	// 			// this.followingWall = false;
-	// 		else
-	// 			await this.turn(0.045 * (sideDistance - newSideDistance));
-	// 	} else if (!this.outlineCreated) {
-	// 		if (frontDistance > this.frontSensor.range - 20)
-	// 			await this.moveForward();
-	// 		else if (frontDistance <= this.frontSensor.range - 20) {
-	// 			await this.turn(PI / 2);
-	// 			this.followingWall = true;
-	// 		}
-	// 	}
-
-		// if (!this.flag) {
-		// 	this.flag = true;
-		// 	await this.moveForward();
-		// }
-
-		// this.moveForward();
-		// await this.turn(PI/2);
-		// this.angle += 0.01;
-	// }
+		await this.turn(deltaAngle);
+		await this.moveForward(distance);
+	}
 
 	show() {
 		const transformedPoints = multiplyMatrices(this.points, this.transMatrix);
