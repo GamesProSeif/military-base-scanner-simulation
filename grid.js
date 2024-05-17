@@ -1,5 +1,5 @@
 class Grid {
-	static GRID_SIZE = 10;
+	static GRID_SIZE = 30;
 
 	constructor(x, y) {
 		this.x = x;

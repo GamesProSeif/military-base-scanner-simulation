@@ -11,15 +11,20 @@ let aiAgent,
 
 function setup() {
 	createCanvas(canvasSize[0], canvasSize[1]);
-	car = new Car(0, 0);
+	// car = new Car(0, 0);
+	car = new Car(width / 2, height / 2);
 	frontSensor = new UltraSonicSensor(car, 0);
 	sideSensor = new UltraSonicSensor(car, PI / 2);
 	aiAgent = new AiAgent(car, frontSensor, sideSensor);
 	stats =[
-		["mouseX", () => (mouseX - width / 2).toFixed(2)],
-		["mouseY", () => (mouseY - height / 2).toFixed(2)],
+		// ["mouseX", () => (mouseX - width / 2).toFixed(2)],
+		// ["mouseY", () => (mouseY - height / 2).toFixed(2)],
+		["mouseX", () => mouseX.toFixed(2)],
+		["mouseY", () => mouseY.toFixed(2)],
 		["Car X,Y", () => `${round(car.x)} ${round(car.y)}`],
-		["Car Angle", () => `${car.angle.toFixed(2)} ${(car.angle * 180 / PI).toFixed(2)}`],
+		["Car Angle", () => `${(car.angle % (2 * PI)).toFixed(2)} ${((car.angle * 180 / PI) % 360).toFixed(2)}`],
+		["Front Sensor", () => aiAgent.frontSensor.getDistance()],
+		["Side Sensor", () => aiAgent.sideSensor.getDistance()],
 		["State", () => aiAgent.state],
 	]
 }
@@ -29,7 +34,7 @@ function draw() {
 	background(220);
 	drawCursor();
 	drawStats();
-	translate(width / 2, height / 2);
+	// translate(width / 2, height / 2);
 	drawObstacles();
 	drawGrids();
 
@@ -66,12 +71,15 @@ function drawGrids() {
 
 function mouseClicked() {
 	// Grid.addGrid(mouseX - width / 2, mouseY - height / 2);
-	obstaclePoints.push(createVector(mouseX - width / 2, mouseY - height / 2, shapeCounter));
+	// obstaclePoints.push(createVector(mouseX - width / 2, mouseY - height / 2, shapeCounter));
+	obstaclePoints.push(createVector(mouseX, mouseY, shapeCounter));
 }
 
 function keyPressed() {
 	if (key === " ")
 		shapeCounter++;
+	else if (key === "g" && aiAgent.state >= 6)
+		car.goTo(mouseX, mouseY);
 }
 
 function drawCursor() {

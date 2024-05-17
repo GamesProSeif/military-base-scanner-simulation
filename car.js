@@ -122,6 +122,13 @@ class Car {
 
 		const deltaAngle = direction.angleBetween(carAngle);
 
+		// console.log("position:", position.x, position.y);
+		// console.log("destination:", destination.x, destination.y);
+		// console.log("distance:", distance);
+		// console.log("carAngle:", carAngle);
+		// console.log("direction:", direction.x, direction.y);
+		// console.log("deltaAngle:", deltaAngle);
+
 		await this.turn(deltaAngle);
 		await this.moveForward(distance);
 	}

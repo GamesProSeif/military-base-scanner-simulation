@@ -80,8 +80,10 @@ class AiAgent {
 					let closestDistance = Infinity;
 					for (const c of contour) {
 						const distance = dist(this.car.x, this.car.y, c.x, c.y);
-						if (distance < closestDistance)
+						if (distance < closestDistance) {
+							closestDistance = distance;
 							closestPixel = c;
+						}
 					}
 					this.sideScanning = false;
 					await this.car.goTo(closestPixel.x, closestPixel.y);
@@ -120,10 +122,10 @@ class AiAgent {
 			grid.discovered = true;
 			if (distance < sensor.range && i === floor(distance)) {
 				grid.obstacle = 1;
-				grid.getNeighbors(true).forEach(g => {
-					g.obstacle = 1
-					g.discovered = true;
-				});
+				// grid.getNeighbors(true).forEach(g => {
+				// 	g.obstacle = 1
+				// 	g.discovered = true;
+				// });
 			}
 		}
 	}

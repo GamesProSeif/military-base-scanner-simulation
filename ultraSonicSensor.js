@@ -37,6 +37,27 @@ class UltraSonicSensor {
 			}
 		}
 
+		for (let grid of Grid.GRIDS.filter(g => g.obstacle === 1)) {
+			let gridPoints = [
+				{ x: grid.x, y: grid.y },
+				{ x: grid.x + Grid.GRID_SIZE, y: grid.y },
+				{ x: grid.x + Grid.GRID_SIZE, y: grid.y + Grid.GRID_SIZE },
+				{ x: grid.x, y: grid.y + Grid.GRID_SIZE }
+			];
+
+			for (let i = 0; i < 4; i++) {
+				const p1 = gridPoints[i];
+				const p2 = gridPoints[(i + 1) % 4];
+
+				const intersection = findIntersection(p1, p2, { x: this.car.x, y: this.car.y }, this.angle - this.car.angle, this.range);
+
+				if (intersection) {
+					let distance = dist(this.car.x, this.car.y, intersection.x, intersection.y);
+					lengths.push(distance + 3);
+				}
+			}
+		}
+
 		return Math.min(...lengths);
 	}
 
